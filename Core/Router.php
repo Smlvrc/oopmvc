@@ -14,7 +14,7 @@ class Router
     private string $method;
 private function parseURL()
 {
-    $this->path=strtolower( str_replace('path','',$_SERVER['QUERY_STRING'])) ;
+    $this->path=strtolower( str_replace('path=','',$_SERVER['REDIRECT_QUERY_STRING'])) ;
     $this->method=strtolower($_SERVER['REQUEST_METHOD']);
 
 }
@@ -73,18 +73,22 @@ $regexRoute=self::generateRouteRegex($path);
 
     public function handleRouter():void
     {
-foreach (self::${$this->method} as $route){
+
+    foreach (self::${$this->method} as $route){
     echo '<pre>';
- print_r($this->path);
-//    print_r("/^".$route['regex']."$/");
+
+
+
+
     if(preg_match("/^".$route['regex']."$/",$this->path,$params)){
 
-     if(is_callable($route['action'],$params)){
-call_user_func_array($route['action']);
-die();
+        array_shift($params);
+     if(is_callable($route['action'])){
+            call_user_func_array($route['action'],$params);
+            die();
      }
      else{
-        $class=$route['action'][0];
+         $class=$route['action'][0];
          $method=$route['action'][1];
          call_user_func([new $class(),$method],...$params);
 die();
@@ -93,6 +97,6 @@ die();
     }
 
 }
-print_r('tapilmadi');
+//print_r('tapilmadi');
     }
 }
